@@ -30,8 +30,7 @@ namespace api.Controllers
 			return Ok(commentDto);
 		}
 
-		[HttpGet]
-		[Route("{id}")]
+		[HttpGet("{id}")]
 		public async Task<IActionResult> GetById([FromRoute] int id)
 		{
 			var comment = await _commentRepo.GetByIdAsync(id);
@@ -53,6 +52,17 @@ namespace api.Controllers
 			var commentModel = commentDto.ToCommentFromCreateCommentDto(stockId);
 			await _commentRepo.CreateAsync(commentModel);
 			return CreatedAtAction(nameof(GetById), new { id = commentModel }, commentModel.ToCommentDto());
+		}
+
+		[HttpPut("{id}")]
+		public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentRequestDto updateDto)
+		{
+			var comment = await _commentRepo.UpdateAsync(id, updateDto.ToCommentFromUpdateDto());
+
+			if (comment == null)
+				return NotFound("Comment not found!");
+
+			return Ok(comment.ToCommentDto());
 		}
 	}
 }
